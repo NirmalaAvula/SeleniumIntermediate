@@ -1,29 +1,26 @@
 package Stepdefination;
-import org.openqa.selenium.WebDriver;
-
-import org.openqa.selenium.chrome.ChromeDriver;
-
+import io.cucumber.java.Before;
 //import io.cucumber.java.Before;
 import io.cucumber.java.en.*; //// no need to import when , then , and packages
-import io.github.bonigarcia.wdm.WebDriverManager;
-//import pageObjects.Baseclass;
+import pageObjects.HookClass;
 import pageObjects.LoginPage;
 
-
 public class Steps {	
-	 public static WebDriver driver;
-	  public static  LoginPage lp;
+	   LoginPage lp;
+	  
+	   @Before
+	    public void setUpPageObject() {
+	        lp = new LoginPage(HookClass.driver);
+	    }
+	   
 	@Given("User launch Chrome browser")
 	public void user_launch_chrome_browser() {
-		WebDriverManager.chromedriver().setup();
-		driver = new ChromeDriver();
-		driver.manage().window().maximize();
-		lp = new LoginPage(driver);
+	    lp = new LoginPage(HookClass.driver); // initialized LoginPage with the WebDriver
 	}
 
 	@When("User opens URL {string}")
 	public void user_opens_url(String URL) {
-		driver.get(URL);
+		HookClass.driver.get(URL);
 	}
 	@Then("the user enters username as {string} and password as {string}")
 	public void the_user_enters_username_as_and_password_as(String username, String password) {
