@@ -1,4 +1,5 @@
 package pageObjects;
+// It is parent class , here created webdriver instance 
 import org.openqa.selenium.WebDriver;
 public abstract class Baseclass {
 	

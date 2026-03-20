@@ -1,5 +1,5 @@
 package pageObjects;
-
+// To Handle browser setup and teardown
 import org.openqa.selenium.WebDriver;
 
 import io.cucumber.java.AfterAll;

@@ -21,24 +21,58 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 //import Stepdefination.Steps;
+import org.testng.asserts.SoftAssert;
 
 import com.github.javafaker.Faker;
 
 import utilities.AssertionUtils;
 
 public class LoginPage extends Baseclass implements Basepage {  // need to import the Steps package because if the class is same package no need to import , if it is different need to import
-	//public  WebDriver ldriver;
-	//public WebDriver driver;
 	public Actions action;
-    public  String firstName;
+    /*public static String firstName;
     public  String lastName;
     public  int apptdate;
-    public  int appttime;
-    
+    public  int appttime;*/
+	
+	private static String firstName;
+    private static String lastName;
+    private int apptdate;
+    private int appttime;
     WebDriverWait wait;
+    
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public int getApptdate() {
+        return apptdate;
+    }
+
+    public void setApptdate(int apptdate) {
+        this.apptdate = apptdate;
+    }
+
+    public int getAppttime() {
+        return appttime;
+    }
+
+    public void setAppttime(int appttime) {
+        this.appttime = appttime;
+    }
 
     public LoginPage(WebDriver driver) {
-        //this.driver = driver;
     	super(driver);
         PageFactory.initElements(driver, this); 
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
@@ -97,7 +131,6 @@ public class LoginPage extends Baseclass implements Basepage {  // need to impor
 
 	    @FindBy(name = "ContinueButton")
 	     WebElement sellAppointmentButton;
-
 	    
 	    @FindBy(name="PhoneType")
 	    WebElement PhoneTypeField;
@@ -240,24 +273,26 @@ public class LoginPage extends Baseclass implements Basepage {  // need to impor
 	}
     @Override
 	public void navigateToHomepage() {
-		AssertionUtils.assertElementVisible(driver,selectedStoreLabel,"Store is visible on the homepage!");
-		System.out.println("Login successful");
+    	String actualText = selectedStoreLabel.getText();
+        String expectedText = "Renewal Support-945";     
+        Assert.assertEquals("Homepage store name match!", expectedText, actualText);
 	}
 
 	public void navigateToAcceptInboundCallPage() {
 		System.out.println("Navigate to AcceptInbound Call");
 		wait.until(ExpectedConditions.visibilityOf(menudropdown)).click();
 	    wait.until(ExpectedConditions.elementToBeClickable(acceptInboundCallOption)).click();
+	    
 	}
 
 	public void fillLeadFormWithRandomData() throws InterruptedException {
 		Faker faker = new Faker();
-		firstName = faker.name().firstName();
-		lastName = faker.name().lastName();
+		setFirstName(faker.name().firstName());
+		setLastName(faker.name().lastName());
 		String address = "UnionNorhwindc" + faker.number().numberBetween(1, 99);
 		wait.until(ExpectedConditions.visibilityOf(firstNameField)).sendKeys(firstName);
 		 lastNameField.sendKeys(lastName);
-	     phoneField.sendKeys("(770) 593-2053");
+	     phoneField.sendKeys("(770) 593-2061");
 	     addressField.sendKeys("UnionNorthwind" + new Random().nextInt(100));
 	     zipField.sendKeys("80223");
 		Select select = new Select(PhoneTypeField);
@@ -303,8 +338,11 @@ public class LoginPage extends Baseclass implements Basepage {  // need to impor
 	}
 
 	public void verifyFormSubmittedSuccessfully() {
-		text.isDisplayed();
-
+		 SoftAssert softAssert = new SoftAssert();
+		    softAssert.assertTrue(text.isDisplayed(), "Form submission text is not visible!");
+		    softAssert.assertEquals(text.getText(), "Lead successfully submitted", "Submission text mismatch!");
+		    softAssert.assertAll();
+		//text.isDisplayed();
 	}
 
 	public void fillAppointmentForm() {
@@ -322,7 +360,7 @@ public class LoginPage extends Baseclass implements Basepage {  // need to impor
 		select1.selectByVisibleText("No");
         wait.until(ExpectedConditions.elementToBeClickable(appointmentDateDropdown));
 		Select apptdate = new Select(appointmentDateDropdown);
-		apptdate.selectByVisibleText("Thursday, February 19, 2026");
+		apptdate.selectByVisibleText("Friday, March 20, 2026");
 		wait.until(ExpectedConditions.elementToBeClickable(appointmentTimeDropdown));
 		Select appttime = new Select(appointmentTimeDropdown);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//option[text()='10:00 AM']")));
@@ -347,12 +385,14 @@ public class LoginPage extends Baseclass implements Basepage {  // need to impor
 		}
 	public void navigateToAppointmentCalendarPage() {
         wait.until(ExpectedConditions.visibilityOf(menudropdown)).click();
+		//wait.until(ExpectedConditions.presenceOfElementLocated(By.id("radcmbMenuOptions")));
+		//wait.until(ExpectedConditions.elementToBeClickable(By.id("radcmbMenuOptions"))).click();
 		wait.until(ExpectedConditions.elementToBeClickable(appointmentCalendarPage)).click();
 		wait.until(ExpectedConditions.elementToBeClickable(appointmentCalendarOption));
 	}
 	public void findScheduledAppointmentForCreatedLead() { 
 		 WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(40), Duration.ofMillis(500));
-		 String xpath = "//tr[td/a[contains(text(),'" + firstName + "')]]/following-sibling::tr[3]";
+		 String xpath = "//tr[td/a[contains(text(),'" + getFirstName() + "')]]/following-sibling::tr[3]";
 		  wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath))).click();
 	}
 	public void clickConfirmButtonOnLeadDetailsPage() {
